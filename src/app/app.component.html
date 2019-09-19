@@ -1,7 +1,7 @@
 <h1 class="title">添加水印</h1>
 
 <div class="container" fxLayout.gt-sm="row wrap" fxLayout.sm="column">
-  <div fxLayout="column" fxFlex="33">
+  <div fxLayout="column" fxFlex.gt-sm="33" fxFlex.sm="100">
     <div fxLayout="column" (click)="uploadFile()" class="upload-btn">
       <span>选择图片</span>
 
@@ -63,7 +63,7 @@
     </div>
   </div>
 
-  <div class="right" fxLayout="column" fxFlex="67">
+  <div class="right" fxLayout="column" fxFlex.gt-sm="67" fxFlex.sm="100">
     <div>
       <button *ngIf="previewUrl" mat-button color="primary" (click)="download()">
         <mat-icon>get_app</mat-icon>
