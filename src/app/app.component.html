@@ -1,5 +1,24 @@
+<h1 class="title">添加水印</h1>
+
 <div class="container" fxLayout.gt-sm="row wrap" fxLayout.sm="column">
   <div fxLayout="column" fxFlex="33">
+    <div fxLayout="column" (click)="uploadFile()" class="upload-btn">
+      <span>选择图片</span>
+
+      <button mat-button color="warn" class="file-upload">
+        <mat-icon>file_upload</mat-icon>
+        选择需要添加水印的图片
+      </button>
+
+      <input
+        #fileUpload
+        type="file"
+        [multiple]="fileUploadOptions.multiple"
+        [accept]="fileUploadOptions.accept"
+        hidden
+      />
+    </div>
+
     <div fxLayout="column">
       <span>水印文字</span>
       <mat-form-field floatLabel="never">
@@ -46,18 +65,6 @@
 
   <div class="right" fxLayout="column" fxFlex="67">
     <div>
-      <input
-        #fileUpload
-        type="file"
-        [multiple]="fileUploadOptions.multiple"
-        [accept]="fileUploadOptions.accept"
-        hidden
-      />
-      <button mat-button color="warn" (click)="uploadFile()">
-        <mat-icon>file_upload</mat-icon>
-        选择图片
-      </button>
-
       <button *ngIf="previewUrl" mat-button color="primary" (click)="download()">
         <mat-icon>get_app</mat-icon>
         下载水印图片

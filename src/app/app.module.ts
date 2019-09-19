@@ -8,9 +8,10 @@ import { ColorPickerModule } from 'ngx-color-picker';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CoreModule } from './core/core.module';
+import { DialogMessageComponent } from './dialog/dialog-message/dialog-message.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, DialogMessageComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -21,6 +22,6 @@ import { CoreModule } from './core/core.module';
   ],
   providers: [],
   bootstrap: [AppComponent],
-  entryComponents: [MatSpinner],
+  entryComponents: [MatSpinner, DialogMessageComponent],
 })
 export class AppModule {}

@@ -1,10 +1,12 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatSnackBar } from '@angular/material';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import domToImage from 'dom-to-image';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 import { from, fromEvent, of, timer, zip } from 'rxjs';
-import { finalize, map, switchMap, tap } from 'rxjs/operators';
+import { finalize, map, switchMap, tap, timeout } from 'rxjs/operators';
 
+import { DialogService } from './dialog/dialog.service';
 import { UiService } from './overlay/ui.service';
 
 @Component({
@@ -12,11 +14,11 @@ import { UiService } from './overlay/ui.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements AfterViewInit, OnDestroy {
+export class AppComponent implements AfterViewInit, OnDestroy, OnInit {
   public watermarkOptions = {
     text: '仅供 xxx 验证使用',
-    fontSize: 12,
-    width: 50,
+    fontSize: 10,
+    width: 5,
     color: '#000000',
     alpha: 35,
     rotate: 35,
@@ -30,10 +32,17 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   public file: File;
   public previewUrl: SafeResourceUrl;
 
-  constructor(public domSanitizer: DomSanitizer, private uiService: UiService) {}
+  constructor(
+    public domSanitizer: DomSanitizer,
+    private dialogService: DialogService,
+    private uiService: UiService,
+    private matSnackBar: MatSnackBar
+  ) {}
 
   @ViewChild('fileUpload', { static: false }) fileInputRef: ElementRef<HTMLInputElement>;
   @ViewChild('preview', { static: false }) previewRef: ElementRef<HTMLDivElement>;
+
+  ngOnInit(): void {}
 
   ngAfterViewInit(): void {
     fromEvent(this.fileInputRef.nativeElement, 'change')
@@ -63,15 +72,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   paint() {
     // 文字长度
     const wordWidth = this.watermarkOptions.fontSize * this.watermarkOptions.text.split('').length;
-    const angle =
-      (this.watermarkOptions.rotate > 90 && this.watermarkOptions.rotate < 180) ||
-      this.watermarkOptions.rotate > 270
-        ? this.watermarkOptions.rotate % 90
-        : 90 - (this.watermarkOptions.rotate % 90);
-    // 倾斜之后的长度
-    const rotateWidth = Math.sin((angle * Math.PI) / 180.0) * wordWidth;
-    // 加上间隔之后的长度
-    const width = rotateWidth + this.watermarkOptions.width;
+    const width = wordWidth + this.watermarkOptions.width;
 
     let svgText = `
     <svg xmlns="http://www.w3.org/2000/svg" width="${width}px" height="${width}px">
@@ -110,13 +111,19 @@ export class AppComponent implements AfterViewInit, OnDestroy {
           a.click();
         }),
         untilDestroyed(this),
+        timeout(5000),
         finalize(() => {
           this.uiService.spin$.next(false);
         })
       )
       .subscribe({
-        next: () => {},
-        error: (e) => console.warn,
+        next: () => {
+          this.matSnackBar.open('下载成功', '确定', { duration: 2000 });
+        },
+        error: (e) => {
+          this.dialogService.openMessage({ title: '下载失败', content: e.message });
+          console.warn(e);
+        },
       });
   }
 

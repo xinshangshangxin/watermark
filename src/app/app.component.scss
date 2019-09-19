@@ -2,12 +2,25 @@ mat-slider {
     width: 100%;
 }
 
+.title {
+    text-align: center;
+}
+
 .container {
     margin: 10px 20px;
 
     mat-form-field {
         padding-left: 8px;
         border: none;
+    }
+
+    .upload-btn {
+        cursor: pointer;
+
+        .file-upload {
+            display: inherit;
+            padding: 8px;
+        }
     }
 
     .right {
