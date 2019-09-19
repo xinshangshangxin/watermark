@@ -23,6 +23,10 @@ mat-slider {
         }
     }
 
+    ::ng-deep color-picker .color-picker {
+        z-index: 10;
+    }
+
     .right {
         padding-left: 10px;
     }

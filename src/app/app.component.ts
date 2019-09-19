@@ -107,7 +107,7 @@ export class AppComponent implements AfterViewInit, OnDestroy, OnInit {
         tap(([url]) => {
           const a = document.createElement('a');
           a.href = url;
-          a.download = name;
+          a.download = '水印图片.png';
           a.click();
         }),
         untilDestroyed(this),
