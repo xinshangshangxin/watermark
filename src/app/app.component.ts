@@ -2,8 +2,10 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@ang
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import domToImage from 'dom-to-image';
 import { untilDestroyed } from 'ngx-take-until-destroy';
-import { fromEvent } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { from, fromEvent, of, timer, zip } from 'rxjs';
+import { finalize, map, switchMap, tap } from 'rxjs/operators';
+
+import { UiService } from './overlay/ui.service';
 
 @Component({
   selector: 'app-root',
@@ -28,7 +30,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   public file: File;
   public previewUrl: SafeResourceUrl;
 
-  constructor(public domSanitizer: DomSanitizer) {}
+  constructor(public domSanitizer: DomSanitizer, private uiService: UiService) {}
 
   @ViewChild('fileUpload', { static: false }) fileInputRef: ElementRef<HTMLInputElement>;
   @ViewChild('preview', { static: false }) previewRef: ElementRef<HTMLDivElement>;
@@ -93,12 +95,29 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   }
 
   async download() {
-    const url = await domToImage.toPng(this.previewRef.nativeElement);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = name;
-    a.click();
+    of(null)
+      .pipe(
+        tap(() => {
+          this.uiService.spin$.next(true);
+        }),
+        switchMap(() => {
+          return zip(from(domToImage.toPng(this.previewRef.nativeElement)), timer(1000));
+        }),
+        tap(([url]) => {
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = name;
+          a.click();
+        }),
+        untilDestroyed(this),
+        finalize(() => {
+          this.uiService.spin$.next(false);
+        })
+      )
+      .subscribe({
+        next: () => {},
+        error: (e) => console.warn,
+      });
   }
 
   ngOnDestroy(): void {}

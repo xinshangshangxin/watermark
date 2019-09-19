@@ -2,6 +2,19 @@ mat-slider {
     width: 100%;
 }
 
+.container {
+    margin: 10px 20px;
+
+    mat-form-field {
+        padding-left: 8px;
+        border: none;
+    }
+
+    .right {
+        padding-left: 10px;
+    }
+}
+
 div {
     width: 100%;
 }
